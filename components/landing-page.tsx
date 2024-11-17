@@ -24,7 +24,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import logo from '@/assets/logos/ocs-logo.svg';
-import Logo from '@/components/logo';
 
 interface Particle {
   x: number;
@@ -274,7 +273,14 @@ const Header: React.FC<HeaderProps> = ({
 }) => (
   <header className='px-4 lg:px-6 h-16 flex items-center justify-between border-b'>
     <Link className='flex items-center justify-center' href='#'>
-      <Logo className='sm:mr-3 w-[35px] h-[35px]' />
+      <Image
+        src={logo}
+        alt='OctaSwap Logo'
+        width={0}
+        height={0}
+        className='sm:mr-3 w-[35px] h-[35px]'
+        priority
+      />
       <span className='text-xl sm:text-2xl font-bold hidden sm:inline-block'>
         Launchpad
       </span>
@@ -541,7 +547,7 @@ const Footer: React.FC = () => (
   </footer>
 );
 
-export default function Home() {
+export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
