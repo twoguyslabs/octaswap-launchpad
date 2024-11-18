@@ -70,10 +70,11 @@ const formSchema = z.object({
   liquidityPercentage: z.string().refine(
     (val) => {
       const num = parseFloat(val);
-      return !isNaN(num) && num > 60;
+      return !isNaN(num) && num > 60 && num <= 100;
     },
     {
-      message: 'Liquidity percentage must be greater than 60%.',
+      message:
+        'Liquidity percentage must be greater than 60% and less or equal to 100%.',
     }
   ),
   liquidityTokens: z.string().min(1, {
@@ -126,7 +127,9 @@ export default function CreateSale() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     const liquidityPercentage = parseFloat(values.liquidityPercentage);
     if (liquidityPercentage <= 60) {
-      alert('Liquidity percentage must be greater than 60%.');
+      alert(
+        'Liquidity percentage must be greater than 60% or less or equal to 100%.'
+      );
       return;
     }
     console.log(values);
@@ -347,7 +350,7 @@ export default function CreateSale() {
                       </FormControl>
                       <FormDescription>
                         Percentage of raised funds that will be added as
-                        liquidity. Must be greater than 60%.
+                        liquidity.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
