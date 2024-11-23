@@ -9,6 +9,7 @@ export default function Logo({ className }: { className?: string }) {
       width={0}
       height={0}
       className={className}
+      priority
     />
   );
 }

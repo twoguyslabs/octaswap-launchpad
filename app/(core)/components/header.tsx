@@ -13,7 +13,6 @@ import { Menu, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Logo from '@/components/logo';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -28,9 +27,6 @@ function NavLink({
   href: string;
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  if (pathname === href) return null;
-
   return (
     <Link href={href} passHref>
       <Button

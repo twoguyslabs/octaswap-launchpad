@@ -22,77 +22,203 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Edit, Trash2, Eye, MoreHorizontal } from 'lucide-react';
+import { Trash2, Eye, MoreHorizontal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { TABS_VALUES } from '@/constants/mix';
+import useSalesAndSale from '../hooks/use-sales-and-sale';
+import { Tables } from '../types/sales';
+import { formatStatus, getSaleStatus, getStatusColor } from '../utils';
+import useSaleStatus from '../hooks/use-sale-status';
+import useSalePool from '../hooks/use-sale-pool';
+import { SALE_ABI } from '@/contracts/abis';
+import { useAccount, useReadContract, useWriteContract } from 'wagmi';
+import { useSaleProgress } from '../hooks/use-sale-progress';
+import Link from 'next/link';
+import { toast } from '@/hooks/use-toast';
+import { delay } from '@/lib/utils';
 
-// Mock data for sales
-const salesData = [
-  {
-    id: 1,
-    title: 'OctaSwap Token Sale',
-    status: 'Live',
-    raised: 1000,
-    hardCap: 5000,
-    startDate: '2024-11-20',
-    endDate: '2024-11-30',
-  },
-  {
-    id: 2,
-    title: 'DeFi Revolution Token',
-    status: 'Upcoming',
-    raised: 0,
-    hardCap: 3000,
-    startDate: '2024-12-01',
-    endDate: '2024-12-15',
-  },
-  {
-    id: 3,
-    title: 'NFT Marketplace Token',
-    status: 'Ended',
-    raised: 2500,
-    hardCap: 2500,
-    startDate: '2024-10-01',
-    endDate: '2024-10-15',
-  },
-  {
-    id: 4,
-    title: 'GameFi Token Launch',
-    status: 'Cancelled',
-    raised: 500,
-    hardCap: 4000,
-    startDate: '2024-09-15',
-    endDate: '2024-09-30',
-  },
-];
+function SaleActions({ sale }: { sale: Tables<'octaswap_launchpad_sales'> }) {
+  const [isPending, setIsPending] = useState(false);
 
-export default function ProjectOwnerDashboard() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const { data: isOpen } = useReadContract({
+    abi: SALE_ABI,
+    address: sale.sale_address as `0x${string}`,
+    functionName: 'isOpen',
+  });
 
-  const filteredSales = salesData.filter((sale) =>
-    sale.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { data: isFinalized } = useReadContract({
+    abi: SALE_ABI,
+    address: sale.sale_address as `0x${string}`,
+    functionName: 'finalized',
+  });
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'live':
-        return 'bg-green-500';
-      case 'upcoming':
-        return 'bg-blue-500';
-      case 'ended':
-        return 'bg-gray-500';
-      case 'cancelled':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
+  const { writeContractAsync: finalizeSale } = useWriteContract();
+
+  const handleFinalizeSale = async () => {
+    setIsPending(true);
+
+    try {
+      await finalizeSale({
+        abi: SALE_ABI,
+        address: sale.sale_address as `0x${string}`,
+        functionName: 'finalize',
+      });
+
+      await delay(15000);
+
+      toast({
+        title: 'Success',
+        description: 'Sale finalized successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description:
+          error instanceof Error ? error.message : 'Failed to finalize sale',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsPending(false);
     }
   };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant='ghost' className='h-8 w-8 p-0'>
+          <span className='sr-only'>Open menu</span>
+          <MoreHorizontal className='h-4 w-4' />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='center'>
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem>
+          <Link
+            href={`/sale/${sale.sale_address}`}
+            className='flex items-center gap-x-2'
+          >
+            <Eye size={17} />
+            View Sale
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          className='text-green-600'
+          onClick={handleFinalizeSale}
+          disabled={isPending || isOpen || isFinalized}
+        >
+          <Trash2 size={17} />
+          Finalize Sale
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function CustomTableRow({
+  sale,
+  activeTab,
+}: {
+  sale: Tables<'octaswap_launchpad_sales'>;
+  activeTab: SaleStatus;
+}) {
+  const saleStatus = useSaleStatus(sale.sale_address);
+  const salePool = useSalePool(sale.sale_address);
+
+  const { data: raised } = useReadContract({
+    abi: SALE_ABI,
+    address: sale.sale_address as `0x${string}`,
+    functionName: 'octaRaised',
+  });
+
+  const { progress, progressPercentage } = useSaleProgress(
+    raised,
+    salePool.hardcap
+  );
+
+  const status = getSaleStatus(saleStatus);
+
+  const startDate = new Date(
+    Number(salePool.startTimestamp) * 1000
+  ).toLocaleDateString();
+
+  const endDate = new Date(
+    Number(salePool.endTimestamp) * 1000
+  ).toLocaleDateString();
+
+  if (activeTab !== 'All' && status !== activeTab) return null;
+
+  return (
+    <TableRow key={sale.sale_address}>
+      <TableCell>{sale.sale_title}</TableCell>
+      <TableCell>
+        <Badge className={getStatusColor(status)}>{formatStatus(status)}</Badge>
+      </TableCell>
+      <TableCell>
+        <div className='flex items-center space-x-2'>
+          <Progress value={progress} className='w-[60px]' />
+          <span className='text-sm text-muted-foreground'>
+            {progressPercentage}%
+          </span>
+        </div>
+      </TableCell>
+      <TableCell>{startDate}</TableCell>
+      <TableCell>{endDate}</TableCell>
+      <TableCell>
+        <SaleActions sale={sale} />
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function SalesTable({
+  sales,
+  activeTab,
+}: {
+  sales: Tables<'octaswap_launchpad_sales'>[] | undefined;
+  activeTab: SaleStatus;
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Sale Title</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Progress</TableHead>
+          <TableHead>Start Date</TableHead>
+          <TableHead>End Date</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {sales?.map((sale) => (
+          <CustomTableRow
+            key={sale.sale_address}
+            sale={sale}
+            activeTab={activeTab}
+          />
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export default function ProjectOwnerDashboard() {
+  const [activeTab, setActiveTab] = useState<SaleStatus>('All');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const { address } = useAccount();
+  const { sales } = useSalesAndSale();
+
+  const mySales = sales?.filter(
+    (sale) => sale.owner.toLowerCase() === address?.toLowerCase()
+  );
 
   return (
     <div className='container mx-auto px-4 py-8'>
@@ -112,131 +238,29 @@ export default function ProjectOwnerDashboard() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Tabs defaultValue='all'>
+          <Tabs
+            defaultValue='All'
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as SaleStatus)}
+          >
             <TabsList>
-              <TabsTrigger value='all'>All Sales</TabsTrigger>
-              <TabsTrigger value='live'>Live</TabsTrigger>
-              <TabsTrigger value='upcoming'>Upcoming</TabsTrigger>
-              <TabsTrigger value='ended'>Ended</TabsTrigger>
+              {TABS_VALUES.map((tab) => (
+                <TabsTrigger key={tab} value={tab}>
+                  {tab}
+                </TabsTrigger>
+              ))}
             </TabsList>
-            <TabsContent value='all'>
-              <SalesTable
-                sales={filteredSales}
-                getStatusColor={getStatusColor}
-              />
-            </TabsContent>
-            <TabsContent value='live'>
-              <SalesTable
-                sales={filteredSales.filter(
-                  (sale) => sale.status.toLowerCase() === 'live'
-                )}
-                getStatusColor={getStatusColor}
-              />
-            </TabsContent>
-            <TabsContent value='upcoming'>
-              <SalesTable
-                sales={filteredSales.filter(
-                  (sale) => sale.status.toLowerCase() === 'upcoming'
-                )}
-                getStatusColor={getStatusColor}
-              />
-            </TabsContent>
-            <TabsContent value='ended'>
-              <SalesTable
-                sales={filteredSales.filter(
-                  (sale) => sale.status.toLowerCase() === 'ended'
-                )}
-                getStatusColor={getStatusColor}
-              />
-            </TabsContent>
+            {TABS_VALUES.map((tab) => (
+              <TabsContent key={tab} value={tab}>
+                <SalesTable sales={mySales} activeTab={activeTab} />
+              </TabsContent>
+            ))}
           </Tabs>
         </CardContent>
         <CardFooter>
-          <Button className='w-full'>Create New Sale</Button>
+          <Button>Create New Sale</Button>
         </CardFooter>
       </Card>
     </div>
-  );
-}
-
-function SalesTable({
-  sales,
-  getStatusColor,
-}: {
-  sales: {
-    id: number;
-    title: string;
-    status: string;
-    raised: number;
-    hardCap: number;
-    startDate: string;
-    endDate: string;
-  }[];
-  getStatusColor: (status: string) => string;
-}) {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Sale Title</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Progress</TableHead>
-          <TableHead>Start Date</TableHead>
-          <TableHead>End Date</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sales.map((sale) => (
-          <TableRow key={sale.id}>
-            <TableCell>{sale.title}</TableCell>
-            <TableCell>
-              <Badge className={`${getStatusColor(sale.status)} text-white`}>
-                {sale.status}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <div className='flex items-center space-x-2'>
-                <Progress
-                  value={(sale.raised / sale.hardCap) * 100}
-                  className='w-[60px]'
-                />
-                <span className='text-sm text-muted-foreground'>
-                  {Math.round((sale.raised / sale.hardCap) * 100)}%
-                </span>
-              </div>
-            </TableCell>
-            <TableCell>{sale.startDate}</TableCell>
-            <TableCell>{sale.endDate}</TableCell>
-            <TableCell>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant='ghost' className='h-8 w-8 p-0'>
-                    <span className='sr-only'>Open menu</span>
-                    <MoreHorizontal className='h-4 w-4' />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem>
-                    <Eye className='mr-2 h-4 w-4' />
-                    View Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Edit className='mr-2 h-4 w-4' />
-                    Edit Sale
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className='text-red-600'>
-                    <Trash2 className='mr-2 h-4 w-4' />
-                    Cancel Sale
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
   );
 }
