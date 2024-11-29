@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OctaSwap Launchpad
 
-## Getting Started
+A modern, decentralized launchpad platform built with Next.js and Web3 technologies. This platform enables users to participate in token launches and manage their investments in a secure and user-friendly environment.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Web3 Integration with RainbowKit and Wagmi
+- Modern UI with Tailwind CSS and Radix UI components
+- Responsive and animated interface
+- Dark/Light theme support
+- Form handling with React Hook Form and Zod validation
+- Supabase integration for data management
+- TypeScript support for enhanced development experience
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework:** Next.js 15.0.3
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:**
+  - Radix UI primitives
+  - Custom components with class-variance-authority
+- **Web3:**
+  - RainbowKit
+  - Wagmi
+  - Viem
+- **State Management:** TanStack Query (React Query)
+- **Database:** Supabase
+- **Form Handling:** React Hook Form with Zod validation
+- **Date Handling:** date-fns, dayjs
+- **Development Tools:**
+  - ESLint
+  - PostCSS
+  - TurboRepo
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚦 Getting Started
 
-## Learn More
+1. **Clone the repository**
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   git clone [repository-url]
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Install dependencies**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npm install
+   ```
 
-## Deploy on Vercel
+3. **Set up environment variables**
+   Create a `.env.development.local` file with the necessary environment variables.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   The application will be available at `http://localhost:3000`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📁 Project Structure
+
+- `/app` - Next.js application routes and layouts
+- `/components` - Reusable UI components
+- `/constants` - Application constants and configurations
+- `/hooks` - Custom React hooks
+- `/lib` - Utility functions and shared logic
+- `/contracts` - Smart contract related files
+- `/config` - Configuration files
+- `/assets` - Static assets
+- `/public` - Public assets
+
+## 🛠️ Available Scripts
+
+- `npm run dev` - Run development server with Turbopack
+- `npm run build` - Build the application
+- `npm run start` - Start the production server
+- `npm run lint` - Run ESLint
+
+## 🔧 Configuration
+
+The project includes several configuration files:
+
+- `next.config.ts` - Next.js configuration
+- `tailwind.config.ts` - Tailwind CSS configuration
+- `tsconfig.json` - TypeScript configuration
+- `postcss.config.mjs` - PostCSS configuration
+- `.eslintrc.json` - ESLint configuration
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+## 📝 License
+
+This project is private and proprietary.

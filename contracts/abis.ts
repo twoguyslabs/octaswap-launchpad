@@ -2033,6 +2033,39 @@ export const VESTING_ABI = [
     inputs: [
       {
         internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'beneficiary',
+        type: 'address',
+      },
+      {
+        internalType: 'uint64',
+        name: 'startTimestamp',
+        type: 'uint64',
+      },
+      {
+        internalType: 'uint64',
+        name: 'durationSeconds',
+        type: 'uint64',
+      },
+    ],
+    name: 'deployVesting',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
         name: 'initialOwner',
         type: 'address',
       },
@@ -2082,52 +2115,6 @@ export const VESTING_ABI = [
     type: 'event',
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'tokenAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: 'beneficiary',
-        type: 'address',
-      },
-      {
-        internalType: 'uint64',
-        name: 'startTimestamp',
-        type: 'uint64',
-      },
-      {
-        internalType: 'uint64',
-        name: 'durationSeconds',
-        type: 'uint64',
-      },
-    ],
-    name: 'deployVesting',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'owner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
@@ -2145,6 +2132,32 @@ export const VESTING_ABI = [
     name: 'transferOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getAllVestings',
+    outputs: [
+      {
+        internalType: 'contract VestingWallet[]',
+        name: '',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
