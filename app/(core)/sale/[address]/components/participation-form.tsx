@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle } from 'lucide-react';
 import { useAccount, useBalance, useReadContract } from 'wagmi';
 import { parseEther } from 'viem';
-import { SALE_ABI } from '@/contracts/abis';
+import { LAUNCHPAD_ABI, SALE_ABI, STAKING_ABI } from '@/contracts/abis';
 import { formatNumber } from '@/lib/utils';
 import useSalePool from '@/app/(core)/hooks/use-sale-pool';
 import { useOcsPrice } from '@/hooks/use-ocs-price';
 import useOctaPrice from '@/hooks/useOctaPrice';
 import Contribution from './participation-form/contribution';
 import AllocationAndTokens from './participation-form/allocation-and-tokens';
+import NoStake from './participation-form/no-stake';
+import useTokenInfo from '@/hooks/useTokenInfo';
+import { LAUNCHPAD_ADDRESS } from '@/contracts/addresses';
 
 export default function ParticipationForm({
   saleAddress,
@@ -26,6 +28,21 @@ export default function ParticipationForm({
   const octaPrice = useOctaPrice();
 
   const salePool = useSalePool(saleAddress);
+
+  const { data: stakingAddress } = useReadContract({
+    account: address as `0x${string}`,
+    abi: LAUNCHPAD_ABI,
+    address: LAUNCHPAD_ADDRESS,
+    functionName: 'staking',
+  });
+
+  const { data: stakeOf } = useReadContract({
+    account: address as `0x${string}`,
+    abi: STAKING_ABI,
+    address: stakingAddress as `0x${string}`,
+    functionName: 'stakeOf',
+    args: [address as `0x${string}`],
+  });
 
   const { data: isClosed } = useReadContract({
     abi: SALE_ABI,
@@ -69,6 +86,9 @@ export default function ParticipationForm({
     args: [address as `0x${string}`],
   });
 
+  const { tokenSymbol } = useTokenInfo(salePool?.tokenAddress);
+
+  const amountStaked = stakeOf ? stakeOf[1] : BigInt(0);
   const receive = formatNumber(Number(contribution) * Number(salePool.rate));
 
   return (
@@ -82,7 +102,9 @@ export default function ParticipationForm({
           stakerAllocation={stakerAllocation}
           purchased={purchased}
           tokenToClaim={tokenToClaim}
+          tokenSymbol={tokenSymbol}
         />
+        <NoStake amountStaked={amountStaked} />
         <Contribution
           isClosed={isClosed}
           octaRaised={octaRaised}
@@ -100,15 +122,6 @@ export default function ParticipationForm({
           octaPrice={octaPrice}
           salePool={salePool}
         />
-        <div className='p-4 bg-yellow-50 rounded-lg'>
-          <div className='flex'>
-            <AlertCircle className='h-5 w-5 text-yellow-400 mr-2' />
-            <div className='text-sm text-yellow-700'>
-              <strong>Note:</strong> Ensure you have sufficient OCTA in your
-              wallet to cover the contribution amount plus gas fees.
-            </div>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );

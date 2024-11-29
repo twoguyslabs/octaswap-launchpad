@@ -38,13 +38,16 @@ export function ProjectInfoCard({
         />
         <div className='flex flex-col items-center gap-y-3 sm:items-start'>
           <CardTitle className='text-3xl'>{sale?.sale_title}</CardTitle>
-          <div className='flex items-center gap-x-3'>
+          <div className='flex items-center gap-2'>
             <Badge className={getStatusColor(status)}>
               {formatStatus(status)}
             </Badge>
-            <div className='text-lg font-medium text-muted-foreground mt-1'>
+            <Badge variant={sale?.is_vesting ? 'default' : 'destructive'}>
+              {sale?.is_vesting ? 'Vesting' : 'No Vesting'}
+            </Badge>
+            {/* <div className='text-lg font-medium text-muted-foreground mt-1'>
               {tokenSymbol}
-            </div>
+            </div> */}
           </div>
         </div>
       </CardHeader>

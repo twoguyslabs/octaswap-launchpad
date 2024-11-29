@@ -4,6 +4,7 @@ import './globals.css';
 import RainbowKit from '@/components/rainbowkit';
 import { Toaster } from '@/components/ui/toaster';
 import 'react-datepicker/dist/react-datepicker.css';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const roboto = Inter({
   subsets: ['latin'],
@@ -22,9 +23,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang='en' suppressHydrationWarning>
       <body className={roboto.className}>
-        <RainbowKit>{children}</RainbowKit>
+        <RainbowKit>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </RainbowKit>
         <Toaster />
       </body>
     </html>

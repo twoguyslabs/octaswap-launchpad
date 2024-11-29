@@ -38,6 +38,7 @@ export type Database = {
         Row: {
           created_at: string;
           discord_url: string;
+          is_vesting: boolean;
           owner: string;
           project_logo: string;
           sale_address: string;
@@ -45,11 +46,13 @@ export type Database = {
           sale_title: string;
           telegram_url: string;
           twitter_url: string;
+          vesting_percent: number;
           website_url: string;
         };
         Insert: {
           created_at?: string;
           discord_url?: string;
+          is_vesting?: boolean;
           owner?: string;
           project_logo?: string;
           sale_address?: string;
@@ -57,11 +60,13 @@ export type Database = {
           sale_title?: string;
           telegram_url?: string;
           twitter_url?: string;
+          vesting_percent?: number;
           website_url?: string;
         };
         Update: {
           created_at?: string;
           discord_url?: string;
+          is_vesting?: boolean;
           owner?: string;
           project_logo?: string;
           sale_address?: string;
@@ -69,6 +74,7 @@ export type Database = {
           sale_title?: string;
           telegram_url?: string;
           twitter_url?: string;
+          vesting_percent?: number;
           website_url?: string;
         };
         Relationships: [];

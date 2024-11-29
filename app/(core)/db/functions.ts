@@ -38,10 +38,29 @@ export async function createSale(sale: {
   twitter_url: string;
   telegram_url: string;
   discord_url: string;
+  is_vesting: boolean;
+  vesting_percent: number;
 }) {
   const supabase = createClient();
   const { error } = await supabase
     .from('octaswap_launchpad_sales')
     .insert([sale]);
+
+  if (error) {
+    console.error('Database error:', error);
+    throw new Error(error.message);
+  }
+
+  return { error: null };
+}
+
+// Delete
+
+export async function deleteSale(saleAddress: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('octaswap_launchpad_sales')
+    .delete()
+    .eq('sale_address', saleAddress);
   return { error };
 }

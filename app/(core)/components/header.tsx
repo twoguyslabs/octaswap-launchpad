@@ -13,6 +13,9 @@ import { Menu, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Logo from '@/components/logo';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ModeToggle } from '@/components/mode-toggle';
+import { Suspense } from 'react';
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -40,13 +43,28 @@ function NavLink({
 }
 
 function SearchInput({ className }: { className?: string }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const params = new URLSearchParams(searchParams);
+    if (e.target.value) {
+      params.set('search', e.target.value);
+    } else {
+      params.delete('search');
+    }
+    router.push(`/dashboard?${params.toString()}`);
+  };
+
   return (
     <div className={`relative ${className}`}>
       <Search className='absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
       <Input
         type='search'
-        placeholder='Search launchpads...'
+        placeholder='Search sales...'
         className='pl-8'
+        value={searchParams.get('search') || ''}
+        onChange={handleSearch}
       />
     </div>
   );
@@ -74,8 +92,9 @@ function MobileMenu() {
               {link.label}
             </NavLink>
           ))}
-          <SearchInput />
-          <Button className='w-full'>Search</Button>
+          <Suspense>
+            <SearchInput />
+          </Suspense>
         </div>
       </SheetContent>
     </Sheet>
@@ -98,9 +117,14 @@ export default function Header() {
               </NavLink>
             ))}
           </div>
-          <SearchInput className='hidden md:block' />
+          <Suspense>
+            <SearchInput className='hidden md:block' />
+          </Suspense>
         </div>
-        <ConnectButton />
+        <div className='flex items-center gap-x-2'>
+          <ModeToggle />
+          <ConnectButton />
+        </div>
       </div>
     </header>
   );

@@ -33,7 +33,10 @@ export default function SaleDetails() {
                 <TabsTrigger value='token-info'>Token Info</TabsTrigger>
               </TabsList>
               <TabsContent value='sale-details'>
-                <SaleDetailsTab saleAddress={saleAddress} />
+                <SaleDetailsTab
+                  saleAddress={saleAddress}
+                  vestingPercent={sale.vesting_percent}
+                />
               </TabsContent>
               <TabsContent value='token-info'>
                 <TokenInfoTab saleAddress={saleAddress} />

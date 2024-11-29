@@ -61,7 +61,7 @@ export function TokenInfoSection({
               </Alert>
             )}
             <FormDescription>
-              The contract address of your token on the blockchain.
+              The contract address of your new token on the blockchain.
             </FormDescription>
             <FormMessage />
           </FormItem>

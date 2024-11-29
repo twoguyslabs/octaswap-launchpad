@@ -29,6 +29,16 @@ export const formSchema = z
     discord: z.string().url({
       message: 'Please enter a valid Discord URL.',
     }),
+    vestingTokens: z.boolean().default(false),
+    tokensForSale: z.string().min(1, {
+      message: 'Tokens for sale is required.',
+    }),
+    tokensForVesting: z.string().min(1, {
+      message: 'Tokens allocated for vesting is required.',
+    }),
+    vestingPeriod: z.string().min(1, {
+      message: 'Vesting period is required.',
+    }),
     softCap: z.string().min(1, {
       message: 'Soft cap is required.',
     }),
@@ -51,17 +61,12 @@ export const formSchema = z
     liquidityTokens: z.string().min(1, {
       message: 'Liquidity in tokens is required.',
     }),
-    startDate: z
-      .date({
-        required_error: 'Start date and time (UTC) is required.',
-      })
-      .nullable(),
-    endDate: z
-      .date({
-        required_error: 'End date and time (UTC) is required.',
-      })
-      .nullable(),
-    // ... other fields ...
+    startDate: z.date({
+      required_error: 'Start date and time (UTC) is required.',
+    }),
+    endDate: z.date({
+      required_error: 'End date and time (UTC) is required.',
+    }),
   })
   .refine(
     (data) => {

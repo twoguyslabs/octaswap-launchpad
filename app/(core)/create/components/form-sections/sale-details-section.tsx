@@ -28,11 +28,11 @@ export function SaleDetailsSection({
           <FormItem>
             <FormLabel>Project Logo</FormLabel>
             <FormControl>
-              <Input placeholder='https://...' {...field} />
+              <Input placeholder='https://domain.com/logo.png' {...field} />
             </FormControl>
             <FormDescription>
-              URL of your project&apos;s logo image. This will be displayed on
-              the sale page.
+              URL of your project&apos;s logo image. URL must be a valid image
+              with extension like .png, .jpg, .jpeg, etc.
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -68,8 +68,7 @@ export function SaleDetailsSection({
               />
             </FormControl>
             <FormDescription>
-              A detailed description of your project and token sale. This helps
-              potential investors understand your offering.
+              A detailed description of your project and token sale.
             </FormDescription>
             <FormMessage />
           </FormItem>

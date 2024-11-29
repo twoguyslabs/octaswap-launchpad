@@ -1,17 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tables } from '../types/sales';
+import { Tables } from '../../types/sales';
 import { useReadContract } from 'wagmi';
 import { SALE_ABI } from '@/contracts/abis';
 import Image from 'next/image';
 import { erc20Abi, formatEther } from 'viem';
-import { useSaleProgress } from '../hooks/use-sale-progress';
+import { useSaleProgress } from '../../hooks/use-sale-progress';
 import Link from 'next/link';
-import { formatStatus, getSaleStatus, getStatusColor } from '../utils';
-import useSalePool from '../hooks/use-sale-pool';
-import useSaleStatus from '../hooks/use-sale-status';
+import { formatStatus, getSaleStatus, getStatusColor } from '../../utils';
+import useSalePool from '../../hooks/use-sale-pool';
+import useSaleStatus from '../../hooks/use-sale-status';
 import { Badge } from '@/components/ui/badge';
+import { formatNumber } from '@/lib/utils';
 
 type SaleCardProps = {
   sale: Tables<'octaswap_launchpad_sales'>;
@@ -22,19 +23,24 @@ const SaleHeader = ({
   title,
   status,
   logoUrl,
+  isVesting,
 }: {
   title: string;
   status: SaleStatus | undefined;
   logoUrl: string;
+  isVesting: boolean;
 }) => {
   return (
     <div className='flex justify-between items-start mb-6'>
       <div className='flex-1 mr-4'>
         <div className='flex flex-col'>
           <CardTitle className='text-2xl leading-tight mb-2'>{title}</CardTitle>
-          <div>
+          <div className='flex items-center gap-2'>
             <Badge className={getStatusColor(status)}>
               {formatStatus(status)}
+            </Badge>
+            <Badge variant={isVesting ? 'default' : 'destructive'}>
+              {isVesting ? 'Vesting' : 'No Vesting'}
             </Badge>
           </div>
         </div>
@@ -63,6 +69,7 @@ const SaleDetails = ({
   const startDate = new Date(
     Number(salePool.startTimestamp) * 1000
   ).toLocaleDateString();
+
   const endDate = new Date(
     Number(salePool.endTimestamp) * 1000
   ).toLocaleDateString();
@@ -73,7 +80,7 @@ const SaleDetails = ({
         <div>
           <div className='text-sm text-muted-foreground mb-1'>Rate</div>
           <div>
-            1 OCTA = {salePool.rate} {tokenSymbol}
+            {formatNumber(Number(salePool.rate))} {tokenSymbol}
           </div>
         </div>
         <div>
@@ -131,6 +138,7 @@ export default function SaleCard({ sale, activeTab }: SaleCardProps) {
         title={sale.sale_title!}
         status={status}
         logoUrl={sale.project_logo as string}
+        isVesting={sale.is_vesting}
       />
       <CardContent className='p-0 space-y-6'>
         <SaleDetails salePool={salePool} tokenSymbol={tokenSymbol || ''} />

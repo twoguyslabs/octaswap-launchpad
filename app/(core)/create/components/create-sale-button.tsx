@@ -1,21 +1,18 @@
 import { useState, useCallback } from 'react';
-import {
-  useSimulateContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from 'wagmi';
+import { useReadContract, useSimulateContract, useWriteContract } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { LAUNCHPAD_ABI } from '@/contracts/abis';
-import { LAUNCHPAD_ADDRESS } from '@/contracts/addresses';
+import { LAUNCHPAD_ABI, VESTING_ABI } from '@/contracts/abis';
+import { LAUNCHPAD_ADDRESS, VESTING_ADDRESS } from '@/contracts/addresses';
 import { delay } from '@/lib/utils';
-import { createSale } from '../../db/functions';
+import { createSale, deleteSale } from '../../db/functions';
 import { FormValues } from '../form-schema';
-import { isAddress, parseEther } from 'viem';
+import { erc20Abi, formatEther, isAddress, parseEther } from 'viem';
 
 interface CreateSaleButtonProps {
   formValues: FormValues;
-  isApproved: boolean;
+  isVestingApproved: boolean;
+  isLaunchpadApproved: boolean;
   isTokenValid: boolean;
   octaPrice: number;
   saleFees: number;
@@ -25,33 +22,67 @@ interface CreateSaleButtonProps {
 
 export function CreateSaleButton({
   formValues,
-  isApproved,
+  isVestingApproved,
+  isLaunchpadApproved,
   isTokenValid,
   octaPrice,
   saleFees,
   address,
   onSuccess,
 }: CreateSaleButtonProps) {
+  const [isSubmitPending, setIsSubmitPending] = useState(false);
+
   const { toast } = useToast();
-  const [isCreatePending, setIsCreatePending] = useState(false);
 
   const {
+    tokensForSale: tokensForSaleString,
     presaleRate,
     softCap,
     hardCap,
     liquidityPercentage,
-    liquidityTokens,
+    liquidityTokens: lpTokens,
     startDate,
     endDate,
     tokenAddress,
+    vestingTokens,
+    tokensForVesting: tokensForVestingString,
+    vestingPeriod: vestingPeriodString,
   } = formValues;
 
   const liquidityBasisPoints = liquidityPercentage
     ? parseFloat(liquidityPercentage) * 100
     : 0;
 
-  const startTimestamp = startDate ? Math.floor(startDate.getTime() / 1000) : 0;
-  const endTimestamp = endDate ? Math.floor(endDate.getTime() / 1000) : 0;
+  const rate = BigInt(presaleRate);
+  const softcap = parseEther(softCap);
+  const hardcap = parseEther(hardCap);
+  const liquidityFunds = BigInt(liquidityBasisPoints);
+  const liquidityTokens = parseEther(lpTokens);
+
+  const startTimestamp = BigInt(
+    startDate ? Math.floor(startDate.getTime() / 1000) : 0
+  );
+
+  const endTimestamp = BigInt(
+    endDate ? Math.floor(endDate.getTime() / 1000) : 0
+  );
+
+  const tokensForSale = parseEther(tokensForSaleString);
+
+  const tokensForVesting = parseEther(tokensForVestingString);
+  const vestingStart = BigInt(Math.floor(Date.now() / 1000));
+  const vestingPeriod = BigInt(vestingPeriodString);
+
+  const { data: tokenTotalSupply } = useReadContract({
+    abi: erc20Abi,
+    address: tokenAddress as `0x${string}`,
+    functionName: 'totalSupply',
+  });
+
+  const totalSupply = tokenTotalSupply ? tokenTotalSupply : BigInt(0);
+
+  const vestingPercent =
+    (Number(tokensForVestingString) / Number(formatEther(totalSupply))) * 100;
 
   const { data: deploySaleConfig } = useSimulateContract({
     abi: LAUNCHPAD_ABI,
@@ -59,16 +90,15 @@ export function CreateSaleButton({
     functionName: 'deploySale',
     args: [
       {
-        rate: BigInt(presaleRate || '0'),
-        softcap: parseEther(softCap || '0'),
-        hardcap: parseEther(hardCap || '0'),
-        liquidityFunds: BigInt(liquidityBasisPoints),
-        liquidityTokens: parseEther(liquidityTokens || '0'),
-        startTimestamp: BigInt(startTimestamp),
-        endTimestamp: BigInt(endTimestamp),
-        tokenAddress: isAddress(tokenAddress)
-          ? (tokenAddress as `0x${string}`)
-          : '0x0000000000000000000000000000000000000000',
+        rate,
+        softcap,
+        hardcap,
+        liquidityFunds,
+        liquidityTokens,
+        startTimestamp,
+        endTimestamp,
+        tokenAddress: tokenAddress as `0x${string}`,
+        tokensForSale,
       },
       parseEther(octaPrice.toString()),
     ],
@@ -82,44 +112,55 @@ export function CreateSaleButton({
     },
   });
 
-  const {
-    writeContractAsync: createWriteContractAsync,
-    data: createData,
-    error: createError,
-  } = useWriteContract();
-
-  const { isLoading: createIsLoading } = useWaitForTransactionReceipt({
-    hash: createData,
-  });
+  const { writeContractAsync: vestingWriteContractAsync } = useWriteContract();
+  const { writeContractAsync: createWriteContractAsync } = useWriteContract();
 
   const onSubmit = useCallback(async () => {
-    if (!isAddress(tokenAddress) || !isTokenValid) {
-      toast({
-        title: 'Error',
-        description: 'Invalid or non-existent token address',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (parseFloat(liquidityPercentage) <= 60) {
-      toast({
-        title: 'Error',
-        description:
-          'Liquidity percentage must be greater than 60% and less or equal to 100%.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setIsCreatePending(true);
+    setIsSubmitPending(true);
 
     try {
-      const result = await createWriteContractAsync(deploySaleConfig!.request);
+      await createSale({
+        sale_address: deploySaleConfig!.result,
+        owner: address,
+        project_logo: formValues.projectLogo,
+        sale_title: formValues.saleTitle,
+        sale_description: formValues.description,
+        website_url: formValues.website,
+        twitter_url: formValues.twitter,
+        telegram_url: formValues.telegram,
+        discord_url: formValues.discord,
+        is_vesting: vestingTokens,
+        vesting_percent: vestingPercent,
+      });
 
-      if (createError) {
-        throw createError;
+      if (vestingTokens) {
+        await vestingWriteContractAsync({
+          abi: VESTING_ABI,
+          address: VESTING_ADDRESS,
+          functionName: 'deployVesting',
+          args: [
+            tokenAddress as `0x${string}`,
+            tokensForVesting,
+            address as `0x${string}`,
+            vestingStart,
+            vestingPeriod,
+          ],
+        });
+
+        toast({
+          title: 'Vesting contract deployment initiated',
+          description: 'Please wait for the transaction to be confirmed.',
+        });
+
+        await delay(15000);
+
+        toast({
+          title: 'Vesting contract deployed',
+          description: 'Sale contract deployment will begin shortly.',
+        });
       }
+
+      await createWriteContractAsync(deploySaleConfig!.request);
 
       toast({
         title: 'Sale contract deployment initiated',
@@ -128,31 +169,12 @@ export function CreateSaleButton({
 
       await delay(15000); // Wait for 15 seconds
 
-      if (result) {
-        const { error } = await createSale({
-          sale_address: deploySaleConfig!.result,
-          owner: address,
-          project_logo: formValues.projectLogo,
-          sale_title: formValues.saleTitle,
-          sale_description: formValues.description,
-          website_url: formValues.website,
-          twitter_url: formValues.twitter,
-          telegram_url: formValues.telegram,
-          discord_url: formValues.discord,
-        });
+      toast({
+        title: 'Success',
+        description: 'Sale created and data stored successfully!',
+      });
 
-        if (error) {
-          console.error('Database error:', error);
-          throw new Error(error.message);
-        }
-
-        toast({
-          title: 'Success',
-          description: 'Sale created and data stored successfully!',
-        });
-
-        onSuccess();
-      }
+      onSuccess();
     } catch (error) {
       toast({
         title: 'Error',
@@ -162,20 +184,25 @@ export function CreateSaleButton({
             : 'Failed to create sale or store data',
         variant: 'destructive',
       });
+
+      await deleteSale(deploySaleConfig!.result);
     } finally {
-      setIsCreatePending(false);
+      setIsSubmitPending(false);
     }
   }, [
+    vestingWriteContractAsync,
+    tokenAddress,
+    vestingTokens,
+    vestingPercent,
+    tokensForVesting,
+    vestingStart,
+    vestingPeriod,
     createWriteContractAsync,
     deploySaleConfig,
     address,
     formValues,
     toast,
-    isTokenValid,
-    createError,
     onSuccess,
-    tokenAddress,
-    liquidityPercentage,
   ]);
 
   return (
@@ -183,15 +210,9 @@ export function CreateSaleButton({
       className='w-full sm:flex-1'
       type='button'
       onClick={onSubmit}
-      disabled={
-        createIsLoading || !isApproved || isCreatePending || !isTokenValid
-      }
+      disabled={!isLaunchpadApproved || isSubmitPending || !isTokenValid}
     >
-      {createIsLoading
-        ? 'Creating...'
-        : isCreatePending
-        ? 'Waiting for Confirmation...'
-        : 'Create Sale'}
+      {isSubmitPending ? 'Creating...' : 'Create Sale'}
     </Button>
   );
 }

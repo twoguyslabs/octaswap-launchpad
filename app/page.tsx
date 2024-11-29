@@ -25,6 +25,7 @@ import Link from 'next/link';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import logo from '@/assets/logos/ocs-logo.svg';
 import Logo from '@/components/logo';
+import { redirect } from 'next/navigation';
 
 interface Particle {
   x: number;
@@ -163,6 +164,7 @@ interface SaleCardProps {
 }
 
 const SaleCard: React.FC<SaleCardProps> = ({ sale }) => {
+  redirect('/dashboard');
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {

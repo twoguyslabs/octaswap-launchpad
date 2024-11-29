@@ -22,8 +22,8 @@ export default function useOctaPrice() {
     // Initial fetch
     fetchOctaPrice();
 
-    // Set up interval to fetch every 1 minute
-    const interval = setInterval(fetchOctaPrice, 60000);
+    // Set up interval to fetch every 10 seconds
+    const interval = setInterval(fetchOctaPrice, 10000);
 
     // Cleanup interval on component unmount
     return () => clearInterval(interval);

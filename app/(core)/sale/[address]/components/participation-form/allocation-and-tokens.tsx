@@ -11,11 +11,13 @@ export default function AllocationAndTokens({
   stakerAllocation,
   purchased,
   tokenToClaim,
+  tokenSymbol,
 }: {
   allocation: bigint | undefined;
   stakerAllocation: bigint | undefined;
   purchased: bigint | undefined;
   tokenToClaim: bigint | undefined;
+  tokenSymbol: string | undefined;
 }) {
   const formattedAllocation = formatNumber(
     Number(
@@ -25,11 +27,10 @@ export default function AllocationAndTokens({
     )
   );
 
-  const formattedPurchased = formatBigIntEther(purchased);
+  const formattedPurchased = formatNumber(Number(formatBigIntEther(purchased)));
 
-  const allocationRemaining = calculateAllocationRemaining(
-    formattedAllocation,
-    formattedPurchased
+  const allocationRemaining = formatNumber(
+    calculateAllocationRemaining(formattedAllocation, formattedPurchased)
   );
 
   const formattedTokenToClaim = formatNumber(
@@ -37,7 +38,7 @@ export default function AllocationAndTokens({
   );
 
   return (
-    <Card className='bg-secondary'>
+    <Card className='bg-primary/5'>
       <CardHeader>
         <CardTitle>Your Allocation & Tokens</CardTitle>
       </CardHeader>
@@ -60,7 +61,7 @@ export default function AllocationAndTokens({
         <div className='grid grid-cols-2 gap-2 text-sm'>
           <div>Your Tokens:</div>
           <div className='font-medium text-right'>
-            {formattedTokenToClaim} APE
+            {formattedTokenToClaim} {tokenSymbol}
           </div>
         </div>
       </CardContent>

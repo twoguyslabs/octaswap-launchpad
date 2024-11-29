@@ -16,8 +16,10 @@ import useSalePool from '@/app/(core)/hooks/use-sale-pool';
 
 export function SaleDetailsTab({
   saleAddress,
+  vestingPercent,
 }: {
   saleAddress: string | undefined;
+  vestingPercent: number;
 }) {
   const salePool = useSalePool(saleAddress);
 
@@ -71,34 +73,49 @@ export function SaleDetailsTab({
             <div>
               <div className='text-sm text-muted-foreground'>Rate</div>
               <div className='font-medium'>
-                1 OCTA = {formatNumber(Number(salePool.rate))} {tokenSymbol}
+                {formatNumber(Number(salePool.rate))} {tokenSymbol}
               </div>
             </div>
             <div>
-              <div className='text-sm text-muted-foreground'>Start Date</div>
-              <div className='font-medium'>{startDate}</div>
+              <div className='text-sm text-muted-foreground'>
+                Token Vesting %
+              </div>
+              <div className='font-medium'>{vestingPercent}%</div>
             </div>
             <div>
               <div className='text-sm text-muted-foreground'>Soft Cap</div>
               <div className='font-medium'>{formattedSoftcap} OCTA</div>
             </div>
             <div>
-              <div className='text-sm text-muted-foreground'>Listing On</div>
-              <div className='font-medium'>OctaSwap</div>
+              <div className='text-sm text-muted-foreground'>Start Date</div>
+              <div className='font-medium'>{startDate}</div>
+            </div>
+            <div>
+              <div className='text-sm text-muted-foreground flex items-center gap-x-1'>
+                <span>Sale Address</span>
+                <Link href={`https://etherscan.io/address/${saleAddress}`}>
+                  <ExternalLink size={15} />
+                </Link>
+              </div>
+              <div className='font-medium'>{truncateAddress(saleAddress)}</div>
             </div>
           </div>
           <div className='space-y-5 lg:space-y-6'>
+            <div>
+              <div className='text-sm text-muted-foreground'>Listing On</div>
+              <div className='font-medium'>OctaSwap</div>
+            </div>
             <div>
               <div className='text-sm text-muted-foreground'>Liquidity %</div>
               <div className='font-medium'>{liquidityPercentage}%</div>
             </div>
             <div>
-              <div className='text-sm text-muted-foreground'>End Date</div>
-              <div className='font-medium'>{endDate}</div>
-            </div>
-            <div>
               <div className='text-sm text-muted-foreground'>Hard Cap</div>
               <div className='font-medium'>{formattedHardcap} OCTA</div>
+            </div>
+            <div>
+              <div className='text-sm text-muted-foreground'>End Date</div>
+              <div className='font-medium'>{endDate}</div>
             </div>
             <div>
               <div className='text-sm text-muted-foreground flex items-center gap-x-1'>

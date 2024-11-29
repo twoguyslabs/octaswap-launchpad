@@ -220,6 +220,14 @@ export default function ProjectOwnerDashboard() {
     (sale) => sale.owner.toLowerCase() === address?.toLowerCase()
   );
 
+  const filteredSales = mySales?.filter((sale) => {
+    if (!searchTerm) return true;
+    return (
+      sale.sale_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.sale_address?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
   return (
     <div className='container mx-auto px-4 py-8'>
       <h1 className='text-3xl font-bold mb-6'>Project Owner Dashboard</h1>
@@ -252,13 +260,15 @@ export default function ProjectOwnerDashboard() {
             </TabsList>
             {TABS_VALUES.map((tab) => (
               <TabsContent key={tab} value={tab}>
-                <SalesTable sales={mySales} activeTab={activeTab} />
+                <SalesTable sales={filteredSales} activeTab={activeTab} />
               </TabsContent>
             ))}
           </Tabs>
         </CardContent>
         <CardFooter>
-          <Button>Create New Sale</Button>
+          <Button asChild>
+            <Link href='/create'>Create New Sale</Link>
+          </Button>
         </CardFooter>
       </Card>
     </div>
