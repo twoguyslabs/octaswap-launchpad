@@ -61,9 +61,7 @@ export default function LaunchpadDisclaimer() {
         </DialogHeader>
         <div className='grid gap-4 py-4'>
           <div className='text-sm text-muted-foreground'>
-            <p>
-              By using this OctaSwap launchpad, you acknowledge and agree that:
-            </p>
+            <p>By using OctaSwap launchpad, you acknowledge and agree that:</p>
             <ul className='list-disc pl-5 mt-2 space-y-1'>
               <li>Cryptocurrency investments carry high risk</li>
               <li>Past performance does not guarantee future results</li>
