@@ -803,77 +803,6 @@ export const LAUNCHPAD_ABI = [
   {
     inputs: [
       {
-        components: [
-          {
-            internalType: 'uint256',
-            name: 'rate',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'softcap',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'hardcap',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'liquidityFunds',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'liquidityTokens',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'startTimestamp',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'endTimestamp',
-            type: 'uint256',
-          },
-          {
-            internalType: 'address',
-            name: 'tokenAddress',
-            type: 'address',
-          },
-          {
-            internalType: 'uint256',
-            name: 'tokensForSale',
-            type: 'uint256',
-          },
-        ],
-        internalType: 'struct Pool',
-        name: '_pool',
-        type: 'tuple',
-      },
-      {
-        internalType: 'uint256',
-        name: '_octaPrice',
-        type: 'uint256',
-      },
-    ],
-    name: 'deploySale',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'address',
         name: '_owner',
         type: 'address',
@@ -959,10 +888,271 @@ export const LAUNCHPAD_ABI = [
     type: 'event',
   },
   {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'rate',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'softcap',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'hardcap',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'liquidityFunds',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'liquidityTokens',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'startTimestamp',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'endTimestamp',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'tokenAddress',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'tokensForSale',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct Pool',
+        name: '_pool',
+        type: 'tuple',
+      },
+    ],
+    name: 'addOldSale',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'allOldSale',
+    outputs: [
+      {
+        internalType: 'contract OCSOldSaleState[]',
+        name: '',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'allSale',
+    outputs: [
+      {
+        internalType: 'contract OCSSale[]',
+        name: '',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'baseAllocation',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'rate',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'softcap',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'hardcap',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'liquidityFunds',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'liquidityTokens',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'startTimestamp',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'endTimestamp',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'tokenAddress',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'tokensForSale',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct Pool',
+        name: '_pool',
+        type: 'tuple',
+      },
+      {
+        internalType: 'uint256',
+        name: '_octaPrice',
+        type: 'uint256',
+      },
+    ],
+    name: 'deploySale',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'feesOwner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'liquidityPoolOwner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'platformFeesInUsd',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'saleIndex',
+        type: 'uint256',
+      },
+    ],
+    name: 'removeOldSale',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'router',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'saleFees',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -1083,123 +1273,6 @@ export const LAUNCHPAD_ABI = [
     type: 'function',
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-    ],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'allSale',
-    outputs: [
-      {
-        internalType: 'contract OCSSale[]',
-        name: '',
-        type: 'address[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'baseAllocation',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'feesOwner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'liquidityPoolOwner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'owner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'platformFeesInUsd',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'router',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'saleFees',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'staking',
     outputs: [
@@ -1223,6 +1296,19 @@ export const LAUNCHPAD_ABI = [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ] as const;

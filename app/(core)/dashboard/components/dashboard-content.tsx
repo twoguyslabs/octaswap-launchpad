@@ -12,17 +12,17 @@ import LaunchpadDisclaimer from './launchpad-disclaimer';
 export default function DashboardContent() {
   const [activeTab, setActiveTab] = useState<SaleStatus>('All');
   const { sales } = useSalesAndSale();
-  const searchParams = useSearchParams();
-  const searchQuery = searchParams.get('search')?.toLowerCase();
+  // const searchParams = useSearchParams();
+  // const searchQuery = searchParams.get('search')?.toLowerCase();
 
-  const filteredSales = sales?.filter((sale) => {
-    if (!searchQuery) return true;
-    return (
-      sale.sale_title?.toLowerCase().includes(searchQuery) ||
-      sale.sale_address?.toLowerCase().includes(searchQuery) ||
-      sale.owner?.toLowerCase().includes(searchQuery)
-    );
-  });
+  // const filteredSales = sales?.filter((sale) => {
+  //   if (!searchQuery) return true;
+  //   return (
+  //     sale.sale_title?.toLowerCase().includes(searchQuery) ||
+  //     sale.sale_address?.toLowerCase().includes(searchQuery) ||
+  //     sale.owner?.toLowerCase().includes(searchQuery)
+  //   );
+  // });
 
   return (
     <main className='container mx-auto px-7 py-8'>
@@ -60,12 +60,11 @@ export default function DashboardContent() {
             <div
               className={cn(
                 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
-                filteredSales?.length === 0 &&
-                  'flex items-center justify-center'
+                sales?.length === 0 && 'flex items-center justify-center'
               )}
             >
-              {filteredSales?.length !== 0
-                ? filteredSales?.map((sale) => (
+              {sales?.length !== 0
+                ? sales?.map((sale) => (
                     <SaleCard
                       key={sale.sale_address}
                       sale={sale}

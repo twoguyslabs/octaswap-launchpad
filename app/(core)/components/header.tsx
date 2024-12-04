@@ -13,32 +13,47 @@ import { Menu, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Logo from '@/components/logo';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Suspense } from 'react';
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import { cn } from '@/lib/utils';
 
-const navLinks = [
+const launchpadLinks = [
   { href: '/dashboard', label: 'Dashboard' },
-  { href: '/create', label: 'Create Sale' },
-  { href: '/my-sales', label: 'My Sales' },
+  { href: '/create', label: 'Create' },
+  { href: '/owner', label: 'Owner' },
 ];
 
-function NavLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+const appLinks = [
+  { href: 'https://app.octaswap.io/swap', label: 'Swap' },
+  { href: 'https://app.octaswap.io/liquidity', label: 'Liquidity' },
+  { href: 'https://app.octaswap.io/staking', label: 'Staking' },
+];
+
+function NavLink({ href, text }: { href: string; text: string }) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
   return (
-    <Link href={href} passHref>
-      <Button
-        variant='ghost'
-        className='w-full justify-start md:w-auto md:justify-center'
-      >
-        {children}
-      </Button>
-    </Link>
+    <NavigationMenuItem className='w-full'>
+      <Link href={href} legacyBehavior passHref>
+        <NavigationMenuLink
+          active={isActive}
+          className={cn(
+            navigationMenuTriggerStyle(),
+            'text-md w-full justify-start'
+          )}
+        >
+          {text}
+        </NavigationMenuLink>
+      </Link>
+    </NavigationMenuItem>
   );
 }
 
@@ -86,15 +101,23 @@ function MobileMenu() {
             <SheetTitle className='text-start m-0'>Launchpad</SheetTitle>
           </SheetHeader>
         </div>
-        <div className='py-4 space-y-4'>
-          {navLinks.map((link) => (
-            <NavLink key={link.href} href={link.href}>
-              {link.label}
-            </NavLink>
-          ))}
-          <Suspense>
+        <div className='space-y-4 pt-6'>
+          <NavigationMenu
+            orientation='vertical'
+            className='max-w-none justify-start'
+          >
+            <NavigationMenuList className='flex-col items-start space-x-0 gap-3 w-full'>
+              {launchpadLinks.map((link) => (
+                <NavLink key={link.href} href={link.href} text={link.label} />
+              ))}
+              {appLinks.map((link) => (
+                <NavLink key={link.href} href={link.href} text={link.label} />
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+          {/* <Suspense>
             <SearchInput />
-          </Suspense>
+          </Suspense> */}
         </div>
       </SheetContent>
     </Sheet>
@@ -111,15 +134,20 @@ export default function Header() {
             <Logo className='w-[35px] h-[35px] align-middle' />
           </div>
           <div className='hidden md:flex'>
-            {navLinks.map((link) => (
-              <NavLink key={link.href} href={link.href}>
-                {link.label}
-              </NavLink>
-            ))}
+            <NavigationMenu orientation='horizontal'>
+              <NavigationMenuList className='space-x-0 gap-3'>
+                {launchpadLinks.map((link) => (
+                  <NavLink key={link.href} href={link.href} text={link.label} />
+                ))}
+                {appLinks.map((link) => (
+                  <NavLink key={link.href} href={link.href} text={link.label} />
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
-          <Suspense>
+          {/* <Suspense>
             <SearchInput className='hidden md:block' />
-          </Suspense>
+          </Suspense> */}
         </div>
         <div className='flex items-center gap-x-2'>
           <ModeToggle />

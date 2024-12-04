@@ -93,7 +93,7 @@ export function SaleDetailsTab({
             <div>
               <div className='text-sm text-muted-foreground flex items-center gap-x-1'>
                 <span>Sale Address</span>
-                <Link href={`https://etherscan.io/address/${saleAddress}`}>
+                <Link href={`https://scan.octa.space/address/${saleAddress}`}>
                   <ExternalLink size={15} />
                 </Link>
               </div>
@@ -120,7 +120,7 @@ export function SaleDetailsTab({
             <div>
               <div className='text-sm text-muted-foreground flex items-center gap-x-1'>
                 <span>LP Holder</span>
-                <Link href={`https://etherscan.io/address/${lpHolder}`}>
+                <Link href={`https://scan.octa.space/address/${lpHolder}`}>
                   <ExternalLink size={15} />
                 </Link>
               </div>
