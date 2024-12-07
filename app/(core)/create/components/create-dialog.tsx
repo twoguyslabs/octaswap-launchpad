@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,9 +12,33 @@ import {
 } from '@/components/ui/dialog';
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-export default function CreateDialog({ saleFees }: { saleFees: number }) {
+export default function CreateDialog({
+  feesString,
+  setFeesString,
+  platformFee,
+  supplyFee,
+  saleFee,
+}: {
+  feesString: 'standard' | 'alternative';
+  setFeesString: (value: 'standard' | 'alternative') => void;
+  platformFee: number;
+  supplyFee: bigint | undefined;
+  saleFee: bigint | undefined;
+}) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const supplyFeePercentage = useMemo(
+    () => (supplyFee ? parseFloat(supplyFee.toString()) / 100 : 0),
+    [supplyFee]
+  );
+
+  const saleFeePercentage = useMemo(
+    () => (saleFee ? parseFloat(saleFee.toString()) / 100 : 0),
+    [saleFee]
+  );
 
   useEffect(() => {
     // Show modal immediately when component mounts
@@ -25,28 +49,49 @@ export default function CreateDialog({ saleFees }: { saleFees: number }) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className='h-full flex flex-col justify-center sm:h-fit'>
         <DialogHeader>
-          <DialogTitle>Create Sale Info</DialogTitle>
+          <DialogTitle>Create Sale</DialogTitle>
           <DialogDescription>
-            Understand our fee structure and learn about custom options
+            Understand our fees structure and learn about custom options
           </DialogDescription>
         </DialogHeader>
-        <div className='space-y-4 py-4'>
-          <div className='space-y-2'>
-            <h3 className='font-medium'>Standard Fee Structure</h3>
-            <ul className='list-disc pl-4 text-sm text-muted-foreground space-y-1'>
-              <li>Platform Fee: $1,000 / {saleFees.toFixed(4)} OCTA</li>
-              <li>Raised Funds Fee: 4% of total raised</li>
-              <li>Token Supply Fee: 1% of total supply</li>
-            </ul>
-          </div>
-          <div className='space-y-2'>
-            <h3 className='font-medium'>Custom Parameters</h3>
-            <p className='text-sm text-muted-foreground'>
-              Need custom sale parameters? Contact our project owner directly on
-              Telegram for personalized solutions.
-            </p>
+        <div>
+          <RadioGroup
+            defaultValue='standard'
+            value={feesString}
+            onValueChange={setFeesString}
+          >
+            <div className='flex items-center gap-2'>
+              <RadioGroupItem value='standard' id='standard' />
+              <Label>Standard</Label>
+            </div>
+            <div className='flex items-center gap-2'>
+              <RadioGroupItem value='alternative' id='alternative' />
+              <Label>Alternative</Label>
+            </div>
+          </RadioGroup>
+          <div className='space-y-4 py-4'>
+            <div className='space-y-2'>
+              <h3 className='font-medium'>
+                <span className='capitalize'>{feesString}</span> Fees Structure
+              </h3>
+              <ul className='list-disc pl-4 text-sm text-muted-foreground space-y-1'>
+                <li>Platform Fee: {platformFee.toFixed(4)} OCTA</li>
+                <li>Raised Funds Fee: {saleFeePercentage}% of total raised</li>
+                <li>
+                  Token Supply Fee: {supplyFeePercentage}% of total supply
+                </li>
+              </ul>
+            </div>
+            <div className='space-y-2'>
+              <h3 className='font-medium'>Custom Parameters</h3>
+              <p className='text-sm text-muted-foreground'>
+                Need custom sale parameters? Contact our project owner directly
+                on Telegram for personalized solutions.
+              </p>
+            </div>
           </div>
         </div>
+
         <DialogFooter className='sm:justify-between gap-2'>
           <Button variant='outline' asChild>
             <Link

@@ -11,7 +11,7 @@ import { erc20Abi, formatEther, isAddress, parseEther } from 'viem';
 
 interface CreateSaleButtonProps {
   formValues: FormValues;
-  isVestingApproved: boolean;
+  feesString: 'standard' | 'alternative';
   isLaunchpadApproved: boolean;
   isTokenValid: boolean;
   octaPrice: number;
@@ -22,7 +22,7 @@ interface CreateSaleButtonProps {
 
 export function CreateSaleButton({
   formValues,
-  isVestingApproved,
+  feesString,
   isLaunchpadApproved,
   isTokenValid,
   octaPrice,
@@ -89,6 +89,7 @@ export function CreateSaleButton({
     address: LAUNCHPAD_ADDRESS,
     functionName: 'deploySale',
     args: [
+      feesString,
       {
         rate,
         softcap,

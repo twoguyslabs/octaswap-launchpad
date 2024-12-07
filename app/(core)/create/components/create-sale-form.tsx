@@ -22,6 +22,10 @@ import { erc20Abi } from 'viem';
 import CreateDialog from './create-dialog';
 
 export default function CreateSaleForm() {
+  const [feesString, setFeesString] = useState<'standard' | 'alternative'>(
+    'standard'
+  );
+
   const [isTokenValid, setIsTokenValid] = useState(false);
 
   const form = useForm<FormValues>({
@@ -54,10 +58,11 @@ export default function CreateSaleForm() {
   const { address } = useAccount();
   const octaPrice = useOctaPrice();
 
-  const { data: platformFees } = useReadContract({
+  const { data: fees } = useReadContract({
     abi: LAUNCHPAD_ABI,
     address: LAUNCHPAD_ADDRESS,
-    functionName: 'platformFeesInUsd',
+    functionName: 'fees',
+    args: [feesString],
   });
 
   const { data: tokenTotalSupply, refetch: refetchTokenTotalSupply } =
@@ -98,7 +103,9 @@ export default function CreateSaleForm() {
       },
     });
 
-  const baseFee = formatEther(platformFees ?? BigInt(0));
+  const [platformFee, supplyFee, saleFee] = fees ?? [];
+
+  const baseFee = formatEther(platformFee ?? BigInt(0));
 
   const saleFees = useMemo(
     () => (baseFee && octaPrice ? parseFloat(baseFee) / octaPrice : 0),
@@ -142,6 +149,13 @@ export default function CreateSaleForm() {
 
   return (
     <>
+      <CreateDialog
+        feesString={feesString}
+        setFeesString={setFeesString}
+        platformFee={saleFees}
+        supplyFee={supplyFee}
+        saleFee={saleFee}
+      />
       <Form {...form}>
         <form onSubmit={(e) => e.preventDefault()} className='space-y-8'>
           <TokenValidation
@@ -159,7 +173,7 @@ export default function CreateSaleForm() {
           <div className='flex flex-col sm:flex-row gap-4'>
             <CreateSaleButton
               formValues={formValues}
-              isVestingApproved={isVestingApproved}
+              feesString={feesString}
               isLaunchpadApproved={isLaunchpadApproved}
               isTokenValid={isTokenValid}
               octaPrice={octaPrice}
@@ -183,7 +197,6 @@ export default function CreateSaleForm() {
           </div>
         </form>
       </Form>
-      <CreateDialog saleFees={saleFees} />
     </>
   );
 }

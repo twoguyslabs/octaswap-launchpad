@@ -827,21 +827,6 @@ export const LAUNCHPAD_ABI = [
         name: '_liquidityPoolOwner',
         type: 'address',
       },
-      {
-        internalType: 'uint256',
-        name: '_platformFeesInUsd',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: '_supplyFees',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: '_saleFees',
-        type: 'uint256',
-      },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -989,6 +974,11 @@ export const LAUNCHPAD_ABI = [
   {
     inputs: [
       {
+        internalType: 'string',
+        name: 'feeString',
+        type: 'string',
+      },
+      {
         components: [
           {
             internalType: 'uint256',
@@ -1058,6 +1048,35 @@ export const LAUNCHPAD_ABI = [
     type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    name: 'fees',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'platformFee',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'supplyFee',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'saleFee',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'feesOwner',
     outputs: [
@@ -1097,19 +1116,6 @@ export const LAUNCHPAD_ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'platformFeesInUsd',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -1143,19 +1149,6 @@ export const LAUNCHPAD_ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'saleFees',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -1164,6 +1157,41 @@ export const LAUNCHPAD_ABI = [
       },
     ],
     name: 'setBaseAllocation',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'feeString',
+        type: 'string',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'platformFee',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'supplyFee',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'saleFee',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct OCSLaunchpad.Fees',
+        name: 'fs',
+        type: 'tuple',
+      },
+    ],
+    name: 'setFees',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1210,38 +1238,12 @@ export const LAUNCHPAD_ABI = [
   {
     inputs: [
       {
-        internalType: 'uint256',
-        name: '_platformFeesInUsd',
-        type: 'uint256',
-      },
-    ],
-    name: 'setPlatformFees',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'address',
         name: '_router',
         type: 'address',
       },
     ],
     name: 'setRouter',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_saleFees',
-        type: 'uint256',
-      },
-    ],
-    name: 'setSaleFees',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1260,19 +1262,6 @@ export const LAUNCHPAD_ABI = [
     type: 'function',
   },
   {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_supplyFees',
-        type: 'uint256',
-      },
-    ],
-    name: 'setSupplyFees',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'staking',
     outputs: [
@@ -1280,19 +1269,6 @@ export const LAUNCHPAD_ABI = [
         internalType: 'address',
         name: '',
         type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'supplyFees',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
       },
     ],
     stateMutability: 'view',
