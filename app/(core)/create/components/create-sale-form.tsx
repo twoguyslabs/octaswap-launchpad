@@ -23,7 +23,7 @@ import CreateDialog from './create-dialog';
 
 export default function CreateSaleForm() {
   const [feesString, setFeesString] = useState<'standard' | 'alternative'>(
-    'standard'
+    'alternative'
   );
 
   const [isTokenValid, setIsTokenValid] = useState(false);
