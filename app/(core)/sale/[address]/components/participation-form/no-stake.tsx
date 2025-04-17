@@ -1,5 +1,5 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import Link from 'next/link';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import Link from 'next/link'
 
 export default function NoStake({ amountStaked }: { amountStaked: bigint }) {
   return (
@@ -8,11 +8,11 @@ export default function NoStake({ amountStaked }: { amountStaked: bigint }) {
         <AlertTitle className='font-bold'>No stake found</AlertTitle>
         <AlertDescription>
           You must stake OCS to participate in the sale.{' '}
-          <Link href='https://app.octaswap.io/staking' className='underline'>
+          <Link href='https://staking.octaswap.io' className='underline'>
             Click here to stake OCS
           </Link>
         </AlertDescription>
       </Alert>
     )
-  );
+  )
 }
